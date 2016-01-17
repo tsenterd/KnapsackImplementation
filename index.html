@@ -1,0 +1,62 @@
+<!-- Made by David Tsenter -->
+<html>
+  <head>
+    <div> <h1 id = "answer"></h1></div>
+    </head>
+    <body>
+        <script>
+var xmlhttp = new XMLHttpRequest();
+var url = "http://shopicruit.myshopify.com/products.json";
+var arr = {};
+var usable=[],array = [];
+var weights = [], prices = [];
+var counter = 0;
+var answers = [];
+xmlhttp.onreadystatechange = function() {
+    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        arr = JSON.parse(xmlhttp.responseText);
+              for (var x = 0;x<arr['products'].length;x++)
+              {
+
+                if (arr['products'][x]['product_type']=="Computer"|| arr['products'][x]['product_type'] == "Keyboard")
+                {
+                  usable.push(arr['products'][x]);
+                }
+              }
+              for (var x = 0;x<usable.length;x++)
+              {
+                  for (var y = 0;y<usable[x]['variants'].length;y++)
+                  {
+                    weights[counter] = usable[x]['variants'][y]['grams'];
+                    prices[counter++] = usable[x]['variants'][y]['price'];
+                  }
+
+              }
+              //build array bottom up
+              var n = counter - 1;
+              for (var x = 1;x<=n;x++)
+              {
+                answers[x] = 0;
+              }
+              document.getElementById("answer").innerHTML = recurse(0,100000,n);
+              console.log(recurse(0,100000,n));
+    }
+};
+xmlhttp.open("GET", url, true);
+xmlhttp.send();
+function max(a,b)
+{
+  return a>b?a:b;
+}
+function recurse(index,weight,n)
+{
+  if (weight < 0)
+    return -1000000;
+  if (index == n+1)
+    return 0;
+
+  return max(prices [index] + recurse(index+1,weight - weights[index],n),recurse(index+1,weight,n));
+}
+      </script>
+    </body>
+</html>
